@@ -145,7 +145,7 @@ function fetchMilestonesRowsFromNotion_(settings) {
       milestone: getPlainPropertyValue_(p, settings.MILESTONES_NAME_PROPERTY),
 
       projectId: getPlainPropertyValue_(p, settings.MILESTONES_PROJECT_ID_PROPERTY),
-      project: getPlainPropertyValue_(p, settings.MILESTONES_PROJECT_PROPERTY),
+      project: getPlainPropertyValue_(p, settings.MILESTONES_PROJECT_NAME_PROPERTY),
 
       status: getPlainPropertyValue_(p, settings.MILESTONES_STATUS_PROPERTY),
       targetDate: getPlainPropertyValue_(p, settings.MILESTONES_TARGET_DATE_PROPERTY),
