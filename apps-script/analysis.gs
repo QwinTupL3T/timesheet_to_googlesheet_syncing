@@ -147,7 +147,9 @@ function analyzeSync_({
     const hasAnyChange =
       taskChanged ||
       milestoneIdChanged ||
+      milestoneChanged ||
       projectIdChanged ||
+      projectChanged ||
       whyChanged ||
       descriptionChanged ||
       dueChanged ||
@@ -232,6 +234,7 @@ function analyzeSync_({
     const hasAnyChange =
       milestoneChanged ||
       projectIdChanged ||
+      projectChanged ||
       statusChanged ||
       targetDateChanged ||
       notesChanged ||
