@@ -1,41 +1,80 @@
 function ensureTaskTimeSpentFormulaColumn_() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TASKS);
-  const lastRow = Math.max(sheet.getLastRow(), 2);
+  const ss = SpreadsheetApp.getActive();
+  const taskSheet = ss.getSheetByName(SHEET_NAMES.TASKS);
+  const timesheetSheet = ss.getSheetByName(SHEET_NAMES.TIMESHEET);
 
+  const lastRow = Math.max(taskSheet.getLastRow(), 2);
   if (lastRow < 2) return;
+
+  const targetCol = getSheetColumnNumberByHeader_(taskSheet, 'Time Spent');
+
+  const timesheetTaskIdColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(timesheetSheet, 'Task_ID')
+  );
+  const timesheetTimeSpentColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(timesheetSheet, 'Time spent')
+  );
 
   const formulas = [];
   for (let row = 2; row <= lastRow; row++) {
     formulas.push([
-      `=IF(A${row}="","",SUMIF(Timesheet!H:H,A${row},Timesheet!B:B))`
+      `=IF(A${row}="","",SUMIF(Timesheet!${timesheetTaskIdColLetter}:${timesheetTaskIdColLetter},A${row},Timesheet!${timesheetTimeSpentColLetter}:${timesheetTimeSpentColLetter}))`
     ]);
   }
 
-  sheet.getRange(2, 12, formulas.length, 1).setFormulas(formulas);
+  taskSheet.getRange(2, targetCol, formulas.length, 1).setFormulas(formulas);
 }
 
 function ensureMilestoneProgressFormulaColumn_() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.MILESTONES);
-  const lastRow = Math.max(sheet.getLastRow(), 2);
+  const ss = SpreadsheetApp.getActive();
+  const milestoneSheet = ss.getSheetByName(SHEET_NAMES.MILESTONES);
+  const taskSheet = ss.getSheetByName(SHEET_NAMES.TASKS);
+
+  const lastRow = Math.max(milestoneSheet.getLastRow(), 2);
   if (lastRow < 2) return;
+
+  const targetCol = getSheetColumnNumberByHeader_(milestoneSheet, 'Progress');
+
+  const tasksMilestoneIdColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(taskSheet, 'Milestone_ID')
+  );
+  const tasksStatusColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(taskSheet, 'Status')
+  );
 
   const formulas = [];
   for (let row = 2; row <= lastRow; row++) {
-    formulas.push([`=IF(A${row}="","",IFERROR(COUNTIFS(Tasks!C:C,A${row},Tasks!K:K,"done")/COUNTIF(Tasks!C:C,A${row}),0))`]);
+    formulas.push([
+      `=IF(A${row}="","",COUNTIFS(Tasks!${tasksMilestoneIdColLetter}:${tasksMilestoneIdColLetter},A${row},Tasks!${tasksStatusColLetter}:${tasksStatusColLetter},"done")&"/"&COUNTIF(Tasks!${tasksMilestoneIdColLetter}:${tasksMilestoneIdColLetter},A${row}))`
+    ]);
   }
 
-  sheet.getRange(2, 10, formulas.length, 1).setFormulas(formulas);
+  milestoneSheet.getRange(2, targetCol, formulas.length, 1).setFormulas(formulas);
 }
 
 function ensureProjectProgressFormulaColumn_() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.PROJECTS);
-  const lastRow = Math.max(sheet.getLastRow(), 2);
+  const ss = SpreadsheetApp.getActive();
+  const projectSheet = ss.getSheetByName(SHEET_NAMES.PROJECTS);
+  const milestoneSheet = ss.getSheetByName(SHEET_NAMES.MILESTONES);
+
+  const lastRow = Math.max(projectSheet.getLastRow(), 2);
   if (lastRow < 2) return;
+
+  const targetCol = getSheetColumnNumberByHeader_(projectSheet, 'Progress');
+
+  const milestoneProjectIdColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(milestoneSheet, 'Project_ID')
+  );
+  const milestoneStatusColLetter = columnNumberToLetter_(
+    getSheetColumnNumberByHeader_(milestoneSheet, 'Status')
+  );
 
   const formulas = [];
   for (let row = 2; row <= lastRow; row++) {
-    formulas.push([`=IF(A${row}="","",IFERROR(COUNTIFS(Milestones!C:C,A${row},Milestones!E:E,"done")/COUNTIF(Milestones!C:C,A${row}),0))`]);
+    formulas.push([
+      `=IF(A${row}="","",COUNTIFS(Milestones!${milestoneProjectIdColLetter}:${milestoneProjectIdColLetter},A${row},Milestones!${milestoneStatusColLetter}:${milestoneStatusColLetter},"done")&"/"&COUNTIF(Milestones!${milestoneProjectIdColLetter}:${milestoneProjectIdColLetter},A${row}))`
+    ]);
   }
 
-  sheet.getRange(2, 11, formulas.length, 1).setFormulas(formulas);
+  projectSheet.getRange(2, targetCol, formulas.length, 1).setFormulas(formulas);
 }
