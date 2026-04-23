@@ -70,10 +70,9 @@ function readExistingMilestoneMap_() {
       status: r[4],
       targetDate: r[5],
       notes: r[6],
-      tasks: r[7],
-      dutyTask: r[8],
-      progress: r[9],
-      lastSynced: r[10],
+      dutyTask: r[7],
+      progress: r[8],
+      lastSynced: r[9],
     });
   });
 
@@ -193,7 +192,6 @@ function mergeMilestones_(milestoneOps) {
         op.status,
         op.targetDate,
         op.notes,
-        op.tasks,
         op.dutyTask,
         '',
         now,
@@ -207,9 +205,8 @@ function mergeMilestones_(milestoneOps) {
         op.status,
         op.targetDate,
         op.notes,
-        op.tasks,
         op.dutyTask,
-        sheet.getRange(op.rowNumber, 10).getValue(),
+        sheet.getRange(op.rowNumber, 9).getValue(),
         now,
       ]]);
     }
