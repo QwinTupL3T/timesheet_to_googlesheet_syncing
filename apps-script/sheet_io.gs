@@ -1,3 +1,34 @@
+function getColumnIndexByHeader_(headersOrSheet, headerName) {
+  let headers;
+
+  if (Array.isArray(headersOrSheet)) {
+    headers = headersOrSheet;
+  } else {
+    headers = headersOrSheet
+      .getRange(1, 1, 1, headersOrSheet.getLastColumn())
+      .getValues()[0];
+  }
+
+  const index = headers.indexOf(headerName);
+  if (index === -1) {
+    throw new Error(`Header not found: ${headerName}`);
+  }
+
+  return index; // 0-based
+}
+
+function getSheetColumnNumberByHeader_(sheet, headerName) {
+  return getColumnIndexByHeader_(sheet, headerName) + 1; // 1-based for getRange
+}
+
+function rowToObjectByHeaders_(row, headers) {
+  const obj = {};
+  headers.forEach((header, i) => {
+    obj[header] = row[i];
+  });
+  return obj;
+}
+
 function readExistingTimesheetIds_() {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TIMESHEET);
   const lastRow = sheet.getLastRow();
@@ -21,27 +52,29 @@ function readExistingTaskMap_() {
 
   if (lastRow < 2) return map;
 
-  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.TASKS.length).getValues();
+  const headers = HEADERS.TASKS;
+  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
 
   values.forEach((r, i) => {
-    const taskId = String(r[0] || '').trim();
+    const row = rowToObjectByHeaders_(r, headers);
+    const taskId = String(row['Task_ID'] || '').trim();
     if (!taskId) return;
 
     map.set(taskId, {
       rowNumber: i + 2,
-      taskId: r[0],
-      task: r[1],
-      milestoneId: r[2],
-      milestone: r[3],
-      projectId: r[4],
-      project: r[5],
-      why: r[6],
-      description: r[7],
-      due: r[8],
-      estimate: r[9],
-      status: r[10],
-      timeSpent: r[11],
-      lastSynced: r[12],
+      taskId: row['Task_ID'],
+      task: row['Task'],
+      milestoneId: row['Milestone_ID'],
+      milestone: row['Milestone'],
+      projectId: row['Project_ID'],
+      project: row['Project'],
+      why: row['Why?'],
+      description: row['Description'],
+      due: row['Due'],
+      estimate: row['Estimate'],
+      status: row['Status'],
+      timeSpent: row['Time Spent'],
+      lastSynced: row['Last Synced'],
     });
   });
 
@@ -55,24 +88,26 @@ function readExistingMilestoneMap_() {
 
   if (lastRow < 2) return map;
 
-  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.MILESTONES.length).getValues();
+  const headers = HEADERS.MILESTONES;
+  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
 
   values.forEach((r, i) => {
-    const milestoneId = String(r[0] || '').trim();
+    const row = rowToObjectByHeaders_(r, headers);
+    const milestoneId = String(row['Milestone_ID'] || '').trim();
     if (!milestoneId) return;
 
     map.set(milestoneId, {
       rowNumber: i + 2,
-      milestoneId: r[0],
-      milestone: r[1],
-      projectId: r[2],
-      project: r[3],
-      status: r[4],
-      targetDate: r[5],
-      notes: r[6],
-      dutyTask: r[7],
-      progress: r[8],
-      lastSynced: r[9],
+      milestoneId: row['Milestone_ID'],
+      milestone: row['Milestone'],
+      projectId: row['Project_ID'],
+      project: row['Project'],
+      status: row['Status'],
+      targetDate: row['Target date'],
+      notes: row['Notes'],
+      dutyTask: row['Duty task?'],
+      progress: row['Progress'],
+      lastSynced: row['Last Synced'],
     });
   });
 
@@ -86,26 +121,28 @@ function readExistingProjectMap_() {
 
   if (lastRow < 2) return map;
 
-  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.PROJECTS.length).getValues();
+  const headers = HEADERS.PROJECTS;
+  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
 
   values.forEach((r, i) => {
-    const projectId = String(r[0] || '').trim();
+    const row = rowToObjectByHeaders_(r, headers);
+    const projectId = String(row['Project_ID'] || '').trim();
     if (!projectId) return;
 
     map.set(projectId, {
       rowNumber: i + 2,
-      projectId: r[0],
-      project: r[1],
-      objective: r[2],
-      definitionOfDone: r[3],
-      status: r[4],
-      stage: r[5],
-      hardDeadline: r[6],
-      softDeadline: r[7],
-      areas: r[8],
-      resources: r[9],
-      progress: r[10],
-      lastSynced: r[11],
+      projectId: row['Project_ID'],
+      project: row['Project'],
+      objective: row['Objective'],
+      definitionOfDone: row['Definition of Done'],
+      status: row['Status'],
+      stage: row['Stage'],
+      hardDeadline: row['Hard Deadline'],
+      softDeadline: row['Soft Deadline'],
+      areas: row['Areas'],
+      resources: row['Resources'],
+      progress: row['Progress'],
+      lastSynced: row['Last Synced'],
     });
   });
 
@@ -134,6 +171,8 @@ function mergeTasks_(taskOps) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TASKS);
   const now = new Date();
 
+  const timeSpentCol = getSheetColumnNumberByHeader_(sheet, 'Time Spent');
+
   const inserts = [];
   taskOps.forEach((op) => {
     if (op.op === 'insert') {
@@ -153,6 +192,8 @@ function mergeTasks_(taskOps) {
         now,
       ]);
     } else {
+      const existingTimeSpent = sheet.getRange(op.rowNumber, timeSpentCol).getValue();
+
       sheet.getRange(op.rowNumber, 1, 1, HEADERS.TASKS.length).setValues([[
         op.taskId,
         op.task,
@@ -165,7 +206,7 @@ function mergeTasks_(taskOps) {
         op.due,
         op.estimate,
         op.status,
-        sheet.getRange(op.rowNumber, 12).getValue(),
+        existingTimeSpent,
         now,
       ]]);
     }
@@ -180,6 +221,8 @@ function mergeTasks_(taskOps) {
 function mergeMilestones_(milestoneOps) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.MILESTONES);
   const now = new Date();
+
+  const progressCol = getSheetColumnNumberByHeader_(sheet, 'Progress');
 
   const inserts = [];
   milestoneOps.forEach((op) => {
@@ -197,6 +240,8 @@ function mergeMilestones_(milestoneOps) {
         now,
       ]);
     } else {
+      const existingProgress = sheet.getRange(op.rowNumber, progressCol).getValue();
+
       sheet.getRange(op.rowNumber, 1, 1, HEADERS.MILESTONES.length).setValues([[
         op.milestoneId,
         op.milestone,
@@ -206,7 +251,7 @@ function mergeMilestones_(milestoneOps) {
         op.targetDate,
         op.notes,
         op.dutyTask,
-        sheet.getRange(op.rowNumber, 9).getValue(),
+        existingProgress,
         now,
       ]]);
     }
@@ -221,6 +266,8 @@ function mergeMilestones_(milestoneOps) {
 function mergeProjects_(projectOps) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.PROJECTS);
   const now = new Date();
+
+  const progressCol = getSheetColumnNumberByHeader_(sheet, 'Progress');
 
   const inserts = [];
   projectOps.forEach((op) => {
@@ -240,6 +287,8 @@ function mergeProjects_(projectOps) {
         now,
       ]);
     } else {
+      const existingProgress = sheet.getRange(op.rowNumber, progressCol).getValue();
+
       sheet.getRange(op.rowNumber, 1, 1, HEADERS.PROJECTS.length).setValues([[
         op.projectId,
         op.project,
@@ -251,7 +300,7 @@ function mergeProjects_(projectOps) {
         op.softDeadline,
         op.areas,
         op.resources,
-        sheet.getRange(op.rowNumber, 11).getValue(),
+        existingProgress,
         now,
       ]]);
     }
