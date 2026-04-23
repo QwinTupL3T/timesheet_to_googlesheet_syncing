@@ -51,7 +51,6 @@ const HEADERS = {
     'Status',
     'Target date',
     'Notes',
-    'Tasks',
     'Duty task?',
   ],
   RAW_PROJECTS: [
@@ -105,7 +104,6 @@ const HEADERS = {
     'Status',
     'Target date',
     'Notes',
-    'Tasks',
     'Duty task?',
     'Progress',
     'Last Synced',
