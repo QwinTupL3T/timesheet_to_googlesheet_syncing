@@ -209,7 +209,6 @@ function analyzeSync_({
         status: row.status,
         targetDate: row.targetDate,
         notes: row.notes,
-        tasks: row.tasks,
         dutyTask: row.dutyTask,
       });
       continue;
@@ -227,8 +226,6 @@ function analyzeSync_({
       normalizeForCompare_(existing.targetDate) !== normalizeForCompare_(row.targetDate);
     const notesChanged =
       normalizeForCompare_(existing.notes) !== normalizeForCompare_(row.notes);
-    const tasksChanged =
-      normalizeForCompare_(existing.tasks) !== normalizeForCompare_(row.tasks);
     const dutyChanged =
       normalizeForCompare_(existing.dutyTask) !== normalizeForCompare_(row.dutyTask);
 
@@ -238,7 +235,6 @@ function analyzeSync_({
       statusChanged ||
       targetDateChanged ||
       notesChanged ||
-      tasksChanged ||
       dutyChanged;
 
     if (hasAnyChange) {
@@ -251,7 +247,6 @@ function analyzeSync_({
           status: { old: existing.status, new: row.status, changed: statusChanged },
           targetDate: { old: existing.targetDate, new: row.targetDate, changed: targetDateChanged },
           notes: { old: existing.notes, new: row.notes, changed: notesChanged },
-          tasks: { old: existing.tasks, new: row.tasks, changed: tasksChanged },
           dutyTask: { old: existing.dutyTask, new: row.dutyTask, changed: dutyChanged },
         })
       }));
@@ -270,7 +265,6 @@ function analyzeSync_({
       status: row.status,
       targetDate: row.targetDate,
       notes: row.notes,
-      tasks: row.tasks,
       dutyTask: row.dutyTask,
     });
   }
