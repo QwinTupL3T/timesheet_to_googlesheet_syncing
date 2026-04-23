@@ -151,7 +151,6 @@ function fetchMilestonesRowsFromNotion_(settings) {
       status: getPlainPropertyValue_(p, settings.MILESTONES_STATUS_PROPERTY),
       targetDate: getPlainPropertyValue_(p, settings.MILESTONES_TARGET_DATE_PROPERTY),
       notes: getPlainPropertyValue_(p, settings.MILESTONES_NOTES_PROPERTY),
-      tasks: getPlainPropertyValue_(p, settings.MILESTONES_TASKS_PROPERTY),
       dutyTask: getPlainPropertyValue_(p, settings.MILESTONES_DUTY_TASK_PROPERTY),
     };
 
@@ -177,7 +176,6 @@ function fetchMilestonesRowsFromNotion_(settings) {
       row.status,
       row.targetDate,
       row.notes,
-      row.tasks,
       row.dutyTask,
     ]);
   });
