@@ -19,24 +19,23 @@ function fetchTimesheetRowsFromNotion_(settings) {
 
   pages.forEach((page) => {
     const p = page.properties || {};
-
     const row = {
       notionPageId: page.id,
       entryId: getPlainPropertyValue_(p, settings.TIMESHEET_ENTRY_ID_PROPERTY),
-      timeSpent: getPlainPropertyValue_(p, 'Time spent'),
-      action: getPlainPropertyValue_(p, 'Action'),
-      actionId: getPlainPropertyValue_(p, 'Action_id'),
-      startTime: getPlainPropertyValue_(p, 'Start Time'),
-      endTime: getPlainPropertyValue_(p, 'End Time'),
+      timeSpent: getPlainPropertyValue_(p, settings.TIMESHEET_TIME_SPENT_PROPERTY),
+      action: getPlainPropertyValue_(p, settings.TIMESHEET_ACTION_PROPERTY),
+      actionId: getPlainPropertyValue_(p, settings.TIMESHEET_ACTION_ID_PROPERTY),
+      startTime: getPlainPropertyValue_(p, settings.TIMESHEET_START_TIME_PROPERTY),
+      endTime: getPlainPropertyValue_(p, settings.TIMESHEET_END_TIME_PROPERTY),
       status: getPlainPropertyValue_(p, settings.TIMESHEET_STATUS_PROPERTY),
-      taskId: getPlainPropertyValue_(p, 'Task_ID'),
-      task: getPlainPropertyValue_(p, 'Task'),
-      milestoneId: getPlainPropertyValue_(p, 'Milestone_ID'),
-      milestone: getPlainPropertyValue_(p, 'Milestone'),
-      projectId: getPlainPropertyValue_(p, 'Project_ID'),
-      project: getPlainPropertyValue_(p, 'Project'),
-      focus: getPlainPropertyValue_(p, 'Focus'),
-      createdTime: getPlainPropertyValue_(p, 'Created time'),
+      taskId: getPlainPropertyValue_(p, settings.TIMESHEET_TASK_ID_PROPERTY),
+      task: getPlainPropertyValue_(p, settings.TIMESHEET_TASK_NAME_PROPERTY),
+      milestoneId: getPlainPropertyValue_(p, settings.TIMESHEET_MILESTONE_ID_PROPERTY),
+      milestone: getPlainPropertyValue_(p, settings.TIMESHEET_MILESTONE_NAME_PROPERTY),
+      projectId: getPlainPropertyValue_(p, settings.TIMESHEET_PROJECT_ID_PROPERTY),
+      project: getPlainPropertyValue_(p, settings.TIMESHEET_PROJECT_NAME_PROPERTY),
+      focus: getPlainPropertyValue_(p, settings.TIMESHEET_FOCUS_PROPERTY),
+      createdTime: getPlainPropertyValue_(p, settings.TIMESHEET_CREATED_TIME_PROPERTY),
       synced: getPlainPropertyValue_(p, settings.TIMESHEET_SYNCED_PROPERTY),
     };
 
@@ -84,10 +83,10 @@ function fetchTaskRowsFromNotion_(settings) {
       notionPageId: page.id,
       taskId: getPlainPropertyValue_(p, settings.TASKS_ID_PROPERTY),
       task: getPlainPropertyValue_(p, settings.TASKS_NAME_PROPERTY),
-      milestoneId: getPlainPropertyValue_(p, 'Milestone_ID'),
-      milestone: getPlainPropertyValue_(p, 'Milestone'),
-      projectId: getPlainPropertyValue_(p, 'Project_ID'),
-      project: getPlainPropertyValue_(p, 'Project'),
+      milestoneId: getPlainPropertyValue_(p, settings.TASKS_MILESTONE_ID_PROPERTY),
+      milestone: getPlainPropertyValue_(p, settings.TASKS_MILESTONE_NAME_PROPERTY),
+      projectId: getPlainPropertyValue_(p, settings.TASKS_PROJECT_ID_PROPERTY),
+      project: getPlainPropertyValue_(p, settings.TASKS_PROJECT_NAME_PROPERTY),
       why: getPlainPropertyValue_(p, settings.TASKS_WHY_PROPERTY),
       description: getPlainPropertyValue_(p, settings.TASKS_DESCRIPTION_PROPERTY),
       due: getPlainPropertyValue_(p, settings.TASKS_DUE_PROPERTY),
@@ -145,8 +144,8 @@ function fetchMilestonesRowsFromNotion_(settings) {
       milestoneId: getPlainPropertyValue_(p, settings.MILESTONES_ID_PROPERTY),
       milestone: getPlainPropertyValue_(p, settings.MILESTONES_NAME_PROPERTY),
 
-      projectId: getPlainPropertyValue_(p, 'Project_ID'),
-      project: getPlainPropertyValue_(p, 'Project'),
+      projectId: getPlainPropertyValue_(p, settings.MILESTONES_PROJECT_ID_PROPERTY),
+      project: getPlainPropertyValue_(p, settings.MILESTONES_PROJECT_PROPERTY),
 
       status: getPlainPropertyValue_(p, settings.MILESTONES_STATUS_PROPERTY),
       targetDate: getPlainPropertyValue_(p, settings.MILESTONES_TARGET_DATE_PROPERTY),
