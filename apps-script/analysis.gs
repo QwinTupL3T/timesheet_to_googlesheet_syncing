@@ -156,23 +156,7 @@ function analyzeSync_({
       estimateChanged ||
       statusChanged;
 
-    if (hasAnyChange) {
-      Logger.log('TASK DIFF DEBUG: ' + JSON.stringify({
-        taskId,
-        changes: buildDiffDebug_({
-          task: { old: existing.task, new: row.task, changed: taskChanged },
-          milestoneId: { old: existing.milestoneId, new: row.milestoneId, changed: milestoneIdChanged },
-          milestone: { old: existing.milestone, new: row.milestone, changed: milestoneChanged },
-          projectId: { old: existing.projectId, new: row.projectId, changed: projectIdChanged },
-          project: { old: existing.project, new: row.project, changed: projectChanged },
-          why: { old: existing.why, new: row.why, changed: whyChanged },
-          description: { old: existing.description, new: row.description, changed: descriptionChanged },
-          due: { old: existing.due, new: row.due, changed: dueChanged },
-          estimate: { old: existing.estimate, new: row.estimate, changed: estimateChanged },
-          status: { old: existing.status, new: row.status, changed: statusChanged },
-        })
-      }));
-    } else continue;
+    if (!hasAnyChange) continue;
 
     if (taskChanged) analysis.tasksRenamed++;
 
@@ -240,20 +224,8 @@ function analyzeSync_({
       notesChanged ||
       dutyChanged;
 
-    if (hasAnyChange) {
-      Logger.log('MILESTONE DIFF DEBUG: ' + JSON.stringify({
-        milestoneId,
-        changes: buildDiffDebug_({
-          milestone: { old: existing.milestone, new: row.milestone, changed: milestoneChanged },
-          projectId: { old: existing.projectId, new: row.projectId, changed: projectIdChanged },
-          project: { old: existing.project, new: row.project, changed: projectChanged },
-          status: { old: existing.status, new: row.status, changed: statusChanged },
-          targetDate: { old: existing.targetDate, new: row.targetDate, changed: targetDateChanged },
-          notes: { old: existing.notes, new: row.notes, changed: notesChanged },
-          dutyTask: { old: existing.dutyTask, new: row.dutyTask, changed: dutyChanged },
-        })
-      }));
-    } else continue;
+
+    if (!hasAnyChange) continue;
 
     if (milestoneChanged) analysis.milestonesRenamed++;
 
@@ -326,22 +298,7 @@ function analyzeSync_({
       areasChanged ||
       resourcesChanged;
 
-    if (hasAnyChange) {
-      Logger.log('PROJECT DIFF DEBUG: ' + JSON.stringify({
-        projectId,
-        changes: buildDiffDebug_({
-          project: { old: existing.project, new: row.project, changed: projectChanged },
-          objective: { old: existing.objective, new: row.objective, changed: objectiveChanged },
-          definitionOfDone: { old: existing.definitionOfDone, new: row.definitionOfDone, changed: definitionChanged },
-          status: { old: existing.status, new: row.status, changed: statusChanged },
-          stage: { old: existing.stage, new: row.stage, changed: stageChanged },
-          hardDeadline: { old: existing.hardDeadline, new: row.hardDeadline, changed: hardDeadlineChanged },
-          softDeadline: { old: existing.softDeadline, new: row.softDeadline, changed: softDeadlineChanged },
-          areas: { old: existing.areas, new: row.areas, changed: areasChanged },
-          resources: { old: existing.resources, new: row.resources, changed: resourcesChanged },
-        })
-      }));
-    } else continue;
+    if (!hasAnyChange) continue;
 
     if (projectChanged) analysis.projectsRenamed++;
 

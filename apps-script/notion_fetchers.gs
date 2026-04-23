@@ -44,6 +44,7 @@ function fetchTimesheetRowsFromNotion_(settings) {
         String(settings.TIMESHEET_DONE_VALUE || '').toLowerCase()
       );
 
+
     if (!isDone) return;
 
     rows.push(row);
@@ -94,18 +95,6 @@ function fetchTaskRowsFromNotion_(settings) {
       status: getPlainPropertyValue_(p, settings.TASKS_STATUS_PROPERTY),
     };
 
-    // Logger.log('TASK ROW DEBUG: ' + JSON.stringify({
-    //   taskId: row.taskId,
-    //   task: row.task,
-    //   milestoneId: row.milestoneId,
-    //   milestone: row.milestone,
-    //   projectId: row.projectId,
-    //   project: row.project,
-    //   why: row.why,
-    //   due: row.due,
-    //   estimate: row.estimate,
-    //   status: row.status
-    // }));
     
 
     rows.push(row);
@@ -153,18 +142,6 @@ function fetchMilestonesRowsFromNotion_(settings) {
       dutyTask: getPlainPropertyValue_(p, settings.MILESTONES_DUTY_TASK_PROPERTY),
     };
 
-    // Logger.log('MILESTONE ROW DEBUG: ' + JSON.stringify({
-    //   milestoneId: row.milestoneId,
-    //   milestone: row.milestone,
-    //   projectId: row.projectId,
-    //   project: row.project,
-    //   status: row.status,
-    //   targetDate: row.targetDate,
-    //   notes: row.notes,
-    //   tasks: row.tasks,
-    //   dutyTask: row.dutyTask
-    // }));
-
     rows.push(row);
 
     rawRows.push([
@@ -209,18 +186,6 @@ function fetchProjectsRowsFromNotion_(settings) {
       resources: getPlainPropertyValue_(p, settings.PROJECTS_RESOURCES_PROPERTY),
     };
 
-    // Logger.log('PROJECT ROW DEBUG: ' + JSON.stringify({
-    //   projectId: row.projectId,
-    //   project: row.project,
-    //   objective: row.objective,
-    //   definitionOfDone: row.definitionOfDone,
-    //   status: row.status,
-    //   stage: row.stage,
-    //   hardDeadline: row.hardDeadline,
-    //   softDeadline: row.softDeadline,
-    //   areas: row.areas,
-    //   resources: row.resources
-    // }));
 
     rows.push(row);
 
