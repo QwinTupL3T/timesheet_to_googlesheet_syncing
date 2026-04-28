@@ -23,29 +23,6 @@ function queryAllDataSourcePages_(dataSourceId, filter, settings) {
   return all;
 }
 
-function markNotionRowsSynced_(pageIds, settings) {
-  const chunks = chunkArray_(pageIds, 10);
-
-  for (const chunk of chunks) {
-    for (const pageId of chunk) {
-      notionRequest_(
-        `https://api.notion.com/v1/pages/${pageId}`,
-        'patch',
-        {
-          properties: {
-            [settings.TIMESHEET_SYNCED_PROPERTY]: {
-              checkbox: true,
-            },
-          },
-        },
-        settings
-      );
-    }
-
-    Utilities.sleep(10);
-  }
-}
-
 function appendTimesheetBatch_(rows) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TIMESHEET);
   const startRow = sheet.getLastRow() + 1;

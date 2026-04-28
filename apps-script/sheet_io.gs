@@ -170,14 +170,6 @@ function overwriteRawImportSheet_(sheetName, headers, rows) {
   }
 }
 
-function appendNewTimesheetRows_(rows) {
-  if (!rows.length) return;
-
-  const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TIMESHEET);
-  const startRow = sheet.getLastRow() + 1;
-  sheet.getRange(startRow, 1, rows.length, HEADERS.TIMESHEET.length).setValues(rows);
-}
-
 function mergeTasks_(taskOps) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAMES.TASKS);
   const now = new Date();

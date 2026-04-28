@@ -11,15 +11,6 @@ function normalizeForCompare_(value) {
     .trim();
 }
 
-function buildDiffDebug_(pairs) {
-  const out = {};
-  Object.keys(pairs).forEach((key) => {
-    const item = pairs[key];
-    if (item.changed) out[key] = item;
-  });
-  return out;
-}
-
 function analyzeSync_({
   timesheetRows,
   taskRows,
