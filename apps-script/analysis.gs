@@ -11,6 +11,45 @@ function normalizeForCompare_(value) {
     .trim();
 }
 
+function compareEntityFields_(existing, row, fieldNames) {
+  return fieldNames.some((fieldName) =>
+    normalizeForCompare_(existing[fieldName]) !== normalizeForCompare_(row[fieldName])
+  );
+}
+
+function analyzeEntityRows_(rows, existingMap, idKey, compareFields, renameKey) {
+  const result = {
+    newCount: 0,
+    updatedCount: 0,
+    renamedCount: 0,
+    ops: [],
+  };
+
+  for (const row of rows) {
+    if (!row[idKey]) continue;
+
+    const entityId = String(row[idKey]);
+    const existing = existingMap.get(entityId);
+
+    if (!existing) {
+      result.newCount++;
+      result.ops.push(Object.assign({ op: 'insert' }, row));
+      continue;
+    }
+
+    if (!compareEntityFields_(existing, row, compareFields)) continue;
+
+    if (renameKey && normalizeForCompare_(existing[renameKey]) !== normalizeForCompare_(row[renameKey])) {
+      result.renamedCount++;
+    }
+
+    result.updatedCount++;
+    result.ops.push(Object.assign({ op: 'update', rowNumber: existing.rowNumber }, row));
+  }
+
+  return result;
+}
+
 function analyzeSync_({
   timesheetRows,
   taskRows,
@@ -78,237 +117,55 @@ function analyzeSync_({
     analysis.notionPageIdsToMarkSynced.push(row.notionPageId);
   }
 
-  for (const row of taskRows) {
-    if (!row.taskId) continue;
+  const taskAnalysis = analyzeEntityRows_(taskRows, existingTaskMap, 'taskId', [
+    'task',
+    'milestoneId',
+    'milestone',
+    'projectId',
+    'project',
+    'why',
+    'description',
+    'due',
+    'estimate',
+    'status',
+  ], 'task');
 
-    const taskId = String(row.taskId);
-    const existing = existingTaskMap.get(taskId);
+  analysis.tasksNew = taskAnalysis.newCount;
+  analysis.tasksUpdated = taskAnalysis.updatedCount;
+  analysis.tasksRenamed = taskAnalysis.renamedCount;
+  analysis.taskOps = taskAnalysis.ops;
 
-    if (!existing) {
-      analysis.tasksNew++;
-      analysis.taskOps.push({
-        op: 'insert',
-        taskId,
-        task: row.task,
-        milestoneId: row.milestoneId,
-        milestone: row.milestone,
-        projectId: row.projectId,
-        project: row.project,
-        why: row.why,
-        description: row.description,
-        due: row.due,
-        estimate: row.estimate,
-        status: row.status,
-      });
-      continue;
-    }
+  const milestoneAnalysis = analyzeEntityRows_(milestoneRows, existingMilestoneMap, 'milestoneId', [
+    'milestone',
+    'projectId',
+    'project',
+    'status',
+    'targetDate',
+    'notes',
+    'dutyTask',
+  ], 'milestone');
 
-    const existingTask = normalizeForCompare_(existing.task);
-    const incomingTask = normalizeForCompare_(row.task);
-    const existingMilestoneId = normalizeForCompare_(existing.milestoneId);
-    const incomingMilestoneId = normalizeForCompare_(row.milestoneId);
-    const existingMilestone = normalizeForCompare_(existing.milestone);
-    const incomingMilestone = normalizeForCompare_(row.milestone);
-    const existingProjectId = normalizeForCompare_(existing.projectId);
-    const incomingProjectId = normalizeForCompare_(row.projectId);
-    const existingProject = normalizeForCompare_(existing.project);
-    const incomingProject = normalizeForCompare_(row.project);
-    const existingWhy = normalizeForCompare_(existing.why);
-    const incomingWhy = normalizeForCompare_(row.why);
-    const existingDescription = normalizeForCompare_(existing.description);
-    const incomingDescription = normalizeForCompare_(row.description);
-    const existingDue = normalizeForCompare_(existing.due);
-    const incomingDue = normalizeForCompare_(row.due);
-    const existingEstimate = normalizeForCompare_(existing.estimate);
-    const incomingEstimate = normalizeForCompare_(row.estimate);
-    const existingStatus = normalizeForCompare_(existing.status);
-    const incomingStatus = normalizeForCompare_(row.status);
+  analysis.milestonesNew = milestoneAnalysis.newCount;
+  analysis.milestonesUpdated = milestoneAnalysis.updatedCount;
+  analysis.milestonesRenamed = milestoneAnalysis.renamedCount;
+  analysis.milestoneOps = milestoneAnalysis.ops;
 
-    const taskChanged = existingTask !== incomingTask;
-    const milestoneIdChanged = existingMilestoneId !== incomingMilestoneId;
-    const milestoneChanged = existingMilestone !== incomingMilestone;
-    const projectIdChanged = existingProjectId !== incomingProjectId;
-    const projectChanged = existingProject !== incomingProject;
-    const whyChanged = existingWhy !== incomingWhy;
-    const descriptionChanged = existingDescription !== incomingDescription;
-    const dueChanged = existingDue !== incomingDue;
-    const estimateChanged = existingEstimate !== incomingEstimate;
-    const statusChanged = existingStatus !== incomingStatus;
+  const projectAnalysis = analyzeEntityRows_(projectRows, existingProjectMap, 'projectId', [
+    'project',
+    'objective',
+    'definitionOfDone',
+    'status',
+    'stage',
+    'hardDeadline',
+    'softDeadline',
+    'areas',
+    'resources',
+  ], 'project');
 
-    const hasAnyChange =
-      taskChanged ||
-      milestoneIdChanged ||
-      milestoneChanged ||
-      projectIdChanged ||
-      projectChanged ||
-      whyChanged ||
-      descriptionChanged ||
-      dueChanged ||
-      estimateChanged ||
-      statusChanged;
-
-    if (!hasAnyChange) continue;
-
-    if (taskChanged) analysis.tasksRenamed++;
-
-    analysis.tasksUpdated++;
-    analysis.taskOps.push({
-      op: 'update',
-      rowNumber: existing.rowNumber,
-      taskId,
-      task: row.task,
-      milestoneId: row.milestoneId,
-      milestone: row.milestone,
-      projectId: row.projectId,
-      project: row.project,
-      why: row.why,
-      description: row.description,
-      due: row.due,
-      estimate: row.estimate,
-      status: row.status,
-    });
-  }
-
-  for (const row of milestoneRows) {
-    if (!row.milestoneId) continue;
-
-    const milestoneId = String(row.milestoneId);
-    const existing = existingMilestoneMap.get(milestoneId);
-
-    if (!existing) {
-      analysis.milestonesNew++;
-      analysis.milestoneOps.push({
-        op: 'insert',
-        milestoneId,
-        milestone: row.milestone,
-        projectId: row.projectId,
-        project: row.project,
-        status: row.status,
-        targetDate: row.targetDate,
-        notes: row.notes,
-        dutyTask: row.dutyTask,
-      });
-      continue;
-    }
-
-    const milestoneChanged =
-      normalizeForCompare_(existing.milestone) !== normalizeForCompare_(row.milestone);
-    const projectIdChanged =
-      normalizeForCompare_(existing.projectId) !== normalizeForCompare_(row.projectId);
-    const projectChanged =
-      normalizeForCompare_(existing.project) !== normalizeForCompare_(row.project);
-    const statusChanged =
-      normalizeForCompare_(existing.status) !== normalizeForCompare_(row.status);
-    const targetDateChanged =
-      normalizeForCompare_(existing.targetDate) !== normalizeForCompare_(row.targetDate);
-    const notesChanged =
-      normalizeForCompare_(existing.notes) !== normalizeForCompare_(row.notes);
-    const dutyChanged =
-      normalizeForCompare_(existing.dutyTask) !== normalizeForCompare_(row.dutyTask);
-
-    const hasAnyChange =
-      milestoneChanged ||
-      projectIdChanged ||
-      projectChanged ||
-      statusChanged ||
-      targetDateChanged ||
-      notesChanged ||
-      dutyChanged;
-
-
-    if (!hasAnyChange) continue;
-
-    if (milestoneChanged) analysis.milestonesRenamed++;
-
-    analysis.milestonesUpdated++;
-    analysis.milestoneOps.push({
-      op: 'update',
-      rowNumber: existing.rowNumber,
-      milestoneId,
-      milestone: row.milestone,
-      projectId: row.projectId,
-      project: row.project,
-      status: row.status,
-      targetDate: row.targetDate,
-      notes: row.notes,
-      dutyTask: row.dutyTask,
-    });
-  }
-
-  for (const row of projectRows) {
-    if (!row.projectId) continue;
-
-    const projectId = String(row.projectId);
-    const existing = existingProjectMap.get(projectId);
-
-    if (!existing) {
-      analysis.projectsNew++;
-      analysis.projectOps.push({
-        op: 'insert',
-        projectId,
-        project: row.project,
-        objective: row.objective,
-        definitionOfDone: row.definitionOfDone,
-        status: row.status,
-        stage: row.stage,
-        hardDeadline: row.hardDeadline,
-        softDeadline: row.softDeadline,
-        areas: row.areas,
-        resources: row.resources,
-      });
-      continue;
-    }
-
-    const projectChanged =
-      normalizeForCompare_(existing.project) !== normalizeForCompare_(row.project);
-    const objectiveChanged =
-      normalizeForCompare_(existing.objective) !== normalizeForCompare_(row.objective);
-    const definitionChanged =
-      normalizeForCompare_(existing.definitionOfDone) !== normalizeForCompare_(row.definitionOfDone);
-    const statusChanged =
-      normalizeForCompare_(existing.status) !== normalizeForCompare_(row.status);
-    const stageChanged =
-      normalizeForCompare_(existing.stage) !== normalizeForCompare_(row.stage);
-    const hardDeadlineChanged =
-      normalizeForCompare_(existing.hardDeadline) !== normalizeForCompare_(row.hardDeadline);
-    const softDeadlineChanged =
-      normalizeForCompare_(existing.softDeadline) !== normalizeForCompare_(row.softDeadline);
-    const areasChanged =
-      normalizeForCompare_(existing.areas) !== normalizeForCompare_(row.areas);
-    const resourcesChanged =
-      normalizeForCompare_(existing.resources) !== normalizeForCompare_(row.resources);
-
-    const hasAnyChange =
-      projectChanged ||
-      objectiveChanged ||
-      definitionChanged ||
-      statusChanged ||
-      stageChanged ||
-      hardDeadlineChanged ||
-      softDeadlineChanged ||
-      areasChanged ||
-      resourcesChanged;
-
-    if (!hasAnyChange) continue;
-
-    if (projectChanged) analysis.projectsRenamed++;
-
-    analysis.projectsUpdated++;
-    analysis.projectOps.push({
-      op: 'update',
-      rowNumber: existing.rowNumber,
-      projectId,
-      project: row.project,
-      objective: row.objective,
-      definitionOfDone: row.definitionOfDone,
-      status: row.status,
-      stage: row.stage,
-      hardDeadline: row.hardDeadline,
-      softDeadline: row.softDeadline,
-      areas: row.areas,
-      resources: row.resources,
-    });
-  }
+  analysis.projectsNew = projectAnalysis.newCount;
+  analysis.projectsUpdated = projectAnalysis.updatedCount;
+  analysis.projectsRenamed = projectAnalysis.renamedCount;
+  analysis.projectOps = projectAnalysis.ops;
 
   return analysis;
 }
