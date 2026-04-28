@@ -42,11 +42,8 @@ function runSync_({ dryRun }) {
         mergeProjects_(analysis.projectOps);
         mergeMilestones_(analysis.milestoneOps);
         mergeTasks_(analysis.taskOps);
-        appendNewTimesheetRows_(analysis.newTimesheetRows);
 
-        if (analysis.notionPageIdsToMarkSynced.length > 0) {
-          markNotionRowsSynced_(analysis.notionPageIdsToMarkSynced, settings);
-        }
+        processTimesheetBatchesWithRecovery_(analysis.newTimesheetRows, analysis.notionPageIdsToMarkSynced, settings);
 
         ensureTaskTimeSpentFormulaColumn_();
         ensureMilestoneProgressFormulaColumn_();
