@@ -1,0 +1,580 @@
+{
+  "version": "1.0",
+  "description": "LifeOS Sheets-Sync Schema - Defines all managed Google Sheets and their column structures",
+  "sheets": {
+    "Timesheet": {
+      "description": "Processed timesheet entries with resolved task/milestone/project references",
+      "columns": [
+        {
+          "name": "Entry_ID",
+          "type": "string",
+          "description": "Unique identifier for timesheet entry from Notion",
+          "required": true
+        },
+        {
+          "name": "Time spent",
+          "type": "number",
+          "description": "Duration in minutes",
+          "required": true
+        },
+        {
+          "name": "Action",
+          "type": "string",
+          "description": "Short description of the action performed",
+          "required": false
+        },
+        {
+          "name": "Action_id",
+          "type": "string",
+          "description": "Unique identifier for the action",
+          "required": false
+        },
+        {
+          "name": "Start Time",
+          "type": "datetime",
+          "description": "ISO 8601 start timestamp",
+          "required": true
+        },
+        {
+          "name": "End Time",
+          "type": "datetime",
+          "description": "ISO 8601 end timestamp",
+          "required": true
+        },
+        {
+          "name": "Task_ID",
+          "type": "string",
+          "description": "Reference to Tasks sheet",
+          "required": false
+        },
+        {
+          "name": "Task",
+          "type": "string",
+          "description": "Task name (denormalized from Tasks sheet)",
+          "required": false
+        },
+        {
+          "name": "Milestone_ID",
+          "type": "string",
+          "description": "Reference to Milestones sheet",
+          "required": false
+        },
+        {
+          "name": "Milestone",
+          "type": "string",
+          "description": "Milestone name (denormalized from Milestones sheet)",
+          "required": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "string",
+          "description": "Reference to Projects sheet",
+          "required": false
+        },
+        {
+          "name": "Project",
+          "type": "string",
+          "description": "Project name (denormalized from Projects sheet)",
+          "required": false
+        },
+        {
+          "name": "Focus",
+          "type": "string",
+          "description": "Focus percentage or intensity indicator",
+          "required": false
+        },
+        {
+          "name": "Created time",
+          "type": "datetime",
+          "description": "When the entry was created in Notion",
+          "required": true
+        }
+      ]
+    },
+    "Tasks": {
+      "description": "Processed task records linked to milestones and projects",
+      "columns": [
+        {
+          "name": "Task_ID",
+          "type": "string",
+          "description": "Unique identifier for the task",
+          "required": true
+        },
+        {
+          "name": "Task",
+          "type": "string",
+          "description": "Task name",
+          "required": true
+        },
+        {
+          "name": "Milestone_ID",
+          "type": "string",
+          "description": "Reference to Milestones sheet",
+          "required": false
+        },
+        {
+          "name": "Milestone",
+          "type": "string",
+          "description": "Milestone name (denormalized)",
+          "required": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "string",
+          "description": "Reference to Projects sheet",
+          "required": false
+        },
+        {
+          "name": "Project",
+          "type": "string",
+          "description": "Project name (denormalized)",
+          "required": false
+        },
+        {
+          "name": "Why?",
+          "type": "text",
+          "description": "Reason or purpose of the task",
+          "required": false
+        },
+        {
+          "name": "Description",
+          "type": "text",
+          "description": "Detailed task description",
+          "required": false
+        },
+        {
+          "name": "Due",
+          "type": "date",
+          "description": "Due date for the task",
+          "required": false
+        },
+        {
+          "name": "Estimate",
+          "type": "number",
+          "description": "Estimated time in minutes",
+          "required": false
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "Task status (e.g., Todo, In Progress, Done)",
+          "required": false,
+          "enum": ["Todo", "In Progress", "Done"]
+        },
+        {
+          "name": "Time Spent",
+          "type": "number",
+          "description": "Computed: sum of timesheet entries for this task",
+          "required": false,
+          "computed": true,
+          "formula": "SUMIF(Timesheet!Task_ID, Task_ID, Timesheet!Time_spent)"
+        },
+        {
+          "name": "Last Synced",
+          "type": "date",
+          "description": "Date when last synced from Notion",
+          "required": false
+        }
+      ]
+    },
+    "Milestones": {
+      "description": "Processed milestone records linked to projects",
+      "columns": [
+        {
+          "name": "Milestone_ID",
+          "type": "string",
+          "description": "Unique identifier for the milestone",
+          "required": true
+        },
+        {
+          "name": "Milestone",
+          "type": "string",
+          "description": "Milestone name",
+          "required": true
+        },
+        {
+          "name": "Project_ID",
+          "type": "string",
+          "description": "Reference to Projects sheet",
+          "required": false
+        },
+        {
+          "name": "Project",
+          "type": "string",
+          "description": "Project name (denormalized)",
+          "required": false
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "Milestone status",
+          "required": false
+        },
+        {
+          "name": "Target date",
+          "type": "date",
+          "description": "Target completion date",
+          "required": false
+        },
+        {
+          "name": "Notes",
+          "type": "text",
+          "description": "Additional notes",
+          "required": false
+        },
+        {
+          "name": "Duty task?",
+          "type": "boolean",
+          "description": "Whether this is a recurring duty task",
+          "required": false
+        },
+        {
+          "name": "Progress",
+          "type": "string",
+          "description": "Computed: completed/total subtasks",
+          "required": false,
+          "computed": true
+        },
+        {
+          "name": "Last Synced",
+          "type": "date",
+          "description": "Date when last synced from Notion",
+          "required": false
+        }
+      ]
+    },
+    "Projects": {
+      "description": "Processed project records",
+      "columns": [
+        {
+          "name": "Project_ID",
+          "type": "string",
+          "description": "Unique identifier for the project",
+          "required": true
+        },
+        {
+          "name": "Project",
+          "type": "string",
+          "description": "Project name",
+          "required": true
+        },
+        {
+          "name": "Objective",
+          "type": "text",
+          "description": "Project objective or goal",
+          "required": false
+        },
+        {
+          "name": "Definition of Done",
+          "type": "text",
+          "description": "Criteria for project completion",
+          "required": false
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "Project status (e.g., Planning, Execution, Done)",
+          "required": false
+        },
+        {
+          "name": "Stage",
+          "type": "string",
+          "description": "Current project stage",
+          "required": false
+        },
+        {
+          "name": "Hard Deadline",
+          "type": "date",
+          "description": "Hard deadline that cannot be moved",
+          "required": false
+        },
+        {
+          "name": "Soft Deadline",
+          "type": "date",
+          "description": "Target deadline that can be adjusted",
+          "required": false
+        },
+        {
+          "name": "Areas",
+          "type": "string",
+          "description": "Areas of life affected (comma-separated)",
+          "required": false
+        },
+        {
+          "name": "Resources",
+          "type": "string",
+          "description": "Required resources (comma-separated)",
+          "required": false
+        },
+        {
+          "name": "Progress",
+          "type": "string",
+          "description": "Computed: completed/total milestones",
+          "required": false,
+          "computed": true
+        },
+        {
+          "name": "Last Synced",
+          "type": "date",
+          "description": "Date when last synced from Notion",
+          "required": false
+        }
+      ]
+    },
+    "Sync_Log": {
+      "description": "Audit log of all sync operations",
+      "columns": [
+        {
+          "name": "Timestamp",
+          "type": "datetime",
+          "description": "When the sync occurred",
+          "required": true
+        },
+        {
+          "name": "Mode",
+          "type": "string",
+          "description": "Sync mode: 'Dry Run' or 'Live Sync'",
+          "required": true,
+          "enum": ["Dry Run", "Live Sync"]
+        },
+        {
+          "name": "Timesheet fetched",
+          "type": "number",
+          "description": "Number of timesheet entries fetched",
+          "required": false
+        },
+        {
+          "name": "Timesheet eligible",
+          "type": "number",
+          "description": "Number of eligible entries",
+          "required": false
+        },
+        {
+          "name": "Timesheet new",
+          "type": "number",
+          "description": "Number of new entries synced",
+          "required": false
+        },
+        {
+          "name": "Timesheet duplicates",
+          "type": "number",
+          "description": "Number of duplicate entries skipped",
+          "required": false
+        },
+        {
+          "name": "Tasks fetched",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Tasks new",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Tasks updated",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Tasks renamed",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Milestones fetched",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Milestones new",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Milestones updated",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Milestones renamed",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Projects fetched",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Projects new",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Projects updated",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Projects renamed",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "Notion rows marked synced",
+          "type": "number",
+          "description": "Number of Notion rows marked as synced",
+          "required": false
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "Overall sync status",
+          "required": true,
+          "enum": ["Success", "Failed", "Partial"]
+        },
+        {
+          "name": "Warnings",
+          "type": "text",
+          "description": "Warning messages",
+          "required": false
+        },
+        {
+          "name": "Error",
+          "type": "text",
+          "description": "Error message if sync failed",
+          "required": false
+        }
+      ]
+    },
+    "Sync_State": {
+      "description": "Tracks batch processing state for recovery on interruption",
+      "columns": [
+        {
+          "name": "Run_ID",
+          "type": "string",
+          "description": "Unique sync run identifier",
+          "required": true
+        },
+        {
+          "name": "Batch_No",
+          "type": "number",
+          "description": "Batch number within the run",
+          "required": true
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "Batch status",
+          "required": true,
+          "enum": ["PENDING", "IN_PROGRESS", "SYNCED", "ROLLED_BACK"]
+        },
+        {
+          "name": "Start_Row",
+          "type": "number",
+          "description": "Starting row in Timesheet sheet",
+          "required": false
+        },
+        {
+          "name": "Row_Count",
+          "type": "number",
+          "description": "Number of rows in batch",
+          "required": false
+        },
+        {
+          "name": "Page_IDs_JSON",
+          "type": "json",
+          "description": "JSON array of Notion page IDs being synced",
+          "required": false
+        },
+        {
+          "name": "Created_At",
+          "type": "datetime",
+          "description": "When batch was created",
+          "required": true
+        }
+      ]
+    },
+    "Notion_Import_Timesheet": {
+      "description": "Raw import from Notion timesheet datasource (overwritten on each sync)",
+      "columns": [
+        "ID",
+        "Time spent",
+        "Action",
+        "Action_id",
+        "Start Time",
+        "End Time",
+        "Status",
+        "Task_ID",
+        "Task",
+        "Milestone_ID",
+        "Milestone",
+        "Project_ID",
+        "Project",
+        "Focus",
+        "Created time",
+        "Synced"
+      ]
+    },
+    "Notion_Import_Tasks": {
+      "description": "Raw import from Notion tasks datasource (overwritten on each sync)",
+      "columns": [
+        "Task_ID",
+        "Task",
+        "Milestone_ID",
+        "Milestone",
+        "Project_ID",
+        "Project",
+        "Why?",
+        "Description",
+        "Due",
+        "Estimate",
+        "Status"
+      ]
+    },
+    "Notion_Import_Milestones": {
+      "description": "Raw import from Notion milestones datasource (overwritten on each sync)",
+      "columns": [
+        "Milestone_ID",
+        "Milestone",
+        "Project_ID",
+        "Project",
+        "Status",
+        "Target date",
+        "Notes",
+        "Duty task?"
+      ]
+    },
+    "Notion_Import_Projects": {
+      "description": "Raw import from Notion projects datasource (overwritten on each sync)",
+      "columns": [
+        "Project_ID",
+        "Project",
+        "Objective",
+        "Definition of Done",
+        "Status",
+        "Stage",
+        "Hard Deadline",
+        "Soft Deadline",
+        "Areas",
+        "Resources"
+      ]
+    },
+    "Settings": {
+      "description": "Configuration key-value pairs for sync behavior",
+      "columns": [
+        {
+          "name": "Key",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "Value",
+          "type": "string",
+          "required": false
+        }
+      ]
+    }
+  }
+}

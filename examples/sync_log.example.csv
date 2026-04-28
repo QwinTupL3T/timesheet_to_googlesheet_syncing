@@ -1,0 +1,4 @@
+Timestamp	Mode	Timesheet fetched	Timesheet eligible	Timesheet new	Timesheet duplicates	Tasks fetched	Tasks new	Tasks updated	Tasks renamed	Milestones fetched	Milestones new	Milestones updated	Milestones renamed	Projects fetched	Projects new	Projects updated	Projects renamed	Notion rows marked synced	Status	Warnings	Error
+4/27/2026 19:17:49	Live Sync													Failed		Bandwidth quota exceeded: https://api.notion.com/v1/data_sources/your-datasource-id/query. Try reducing the rate of data transfer.
+4/27/2026 19:18:37	Live Sync													Failed		Bandwidth quota exceeded: https://api.notion.com/v1/pages/your-page-id. Try reducing the rate of data transfer.
+4/27/2026 19:23:35	Live Sync													Failed		Bandwidth quota exceeded: https://api.notion.com/v1/data_sources/your-other-datasource-id/query. Try reducing the rate of data transfer.

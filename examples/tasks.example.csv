@@ -1,0 +1,5 @@
+Task_ID	Task	Milestone_ID	Milestone	Project_ID	Project	Why?	Description	Due	Estimate	Status	Time Spent	Last Synced
+12	In progess to done concat in linked wip	4	Timesheet setup	4	LifeOS			2026-03-04	30	Done	0	4/27/2026
+7	Setup context modes and integrate with focus modes on iphone, so that timesheets will have predefined types.	4	Timesheet setup	4	LifeOS			2026-03-21	180	Todo	0	4/27/2026
+10	Make a logic for making end dates entries for forgotten ones	4	Timesheet setup	4	LifeOS			2026-03-05	240	Done	0	4/27/2026
+8	Add untracked time metrics (the time that was not recorded in between the entries, for analytics of how well im leveraging timesheets)	4	Timesheet setup	4	LifeOS			2026-03-21	30	Todo	0	4/27/2026
