@@ -29,6 +29,17 @@ function rowToObjectByHeaders_(row, headers) {
   return obj;
 }
 
+function columnNumberToLetter_(columnNumber) {
+  let temp = '';
+  let num = columnNumber;
+  while (num > 0) {
+    const rem = (num - 1) % 26;
+    temp = String.fromCharCode(65 + rem) + temp;
+    num = Math.floor((num - 1) / 26);
+  }
+  return temp;
+}
+
 function readExistingEntityMap_(sheetName, headers, idField, rowMapper) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(sheetName);
   const lastRow = sheet.getLastRow();
@@ -46,17 +57,6 @@ function readExistingEntityMap_(sheetName, headers, idField, rowMapper) {
   });
 
   return map;
-}
-
-function columnNumberToLetter_(columnNumber) {
-  let temp = '';
-  let num = columnNumber;
-  while (num > 0) {
-    const rem = (num - 1) % 26;
-    temp = String.fromCharCode(65 + rem) + temp;
-    num = Math.floor((num - 1) / 26);
-  }
-  return temp;
 }
 
 function readExistingTimesheetIds_() {
